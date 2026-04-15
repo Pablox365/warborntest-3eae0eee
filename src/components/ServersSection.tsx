@@ -1,6 +1,6 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import warbornNormal from "@/assets/warborn-normal.png";
-import warbornHardcore from "@/assets/warborn-hardcore.png";
+import warbornHardcore from "@/assets/warborn-hardcore-clean.png";
 import { Users, MapPin, Wifi, Copy, Play } from "lucide-react";
 
 const servers = [

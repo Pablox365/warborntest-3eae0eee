@@ -1,5 +1,5 @@
 import warbornNormal from "@/assets/warborn-normal.png";
-import warbornHardcore from "@/assets/warborn-hardcore.png";
+import warbornHardcore from "@/assets/warborn-hardcore-clean.png";
 
 const socials = [
   {

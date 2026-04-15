@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Particles from "./Particles";
 import heroBg from "@/assets/hero-bg.jpg";
 import warbornNormal from "@/assets/warborn-normal.png";
-import warbornHardcore from "@/assets/warborn-hardcore.png";
+import warbornHardcore from "@/assets/warborn-hardcore-clean.png";
 import { Crosshair, Shield, Radio, ChevronDown } from "lucide-react";
 
 const HeroSection = () => {
