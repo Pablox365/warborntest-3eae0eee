@@ -154,11 +154,11 @@ function useCrud(table: "products" | "mods" | "roadmap_items" | "announcements")
   const upsert = useMutation({
     mutationFn: async (item: any) => {
       if (item.id) {
-        const { id, created_at, updated_at, ...rest } = item;
+        const { id: _id, created_at: _ca, updated_at: _ua, ...rest } = item;
         const { error } = await supabase.from(table).update(rest).eq("id", id);
         if (error) throw error;
       } else {
-        const { id, created_at, updated_at, ...rest } = item;
+        const { id: _id, created_at: _ca, updated_at: _ua, ...rest } = item;
         const { error } = await supabase.from(table).insert(rest);
         if (error) throw error;
       }
@@ -179,7 +179,7 @@ function useCrud(table: "products" | "mods" | "roadmap_items" | "announcements")
 
 // === Products Admin ===
 const ProductsAdmin = () => {
-  const { data: products, isLoading, upsert, remove } = useCrud<any>("products");
+  const { data: products, isLoading, upsert, remove } = useCrud("products");
   const [editing, setEditing] = useState<any>(null);
 
   if (isLoading) return <Loading />;
@@ -235,7 +235,7 @@ const ProductsAdmin = () => {
 
 // === Mods Admin ===
 const ModsAdmin = () => {
-  const { data: mods, isLoading, upsert, remove } = useCrud<any>("mods");
+  const { data: mods, isLoading, upsert, remove } = useCrud("mods");
   const [editing, setEditing] = useState<any>(null);
 
   if (isLoading) return <Loading />;
@@ -293,7 +293,7 @@ const ModsAdmin = () => {
 
 // === Roadmap Admin ===
 const RoadmapAdmin = () => {
-  const { data: items, isLoading, upsert, remove } = useCrud<any>("roadmap_items");
+  const { data: items, isLoading, upsert, remove } = useCrud("roadmap_items");
   const [editing, setEditing] = useState<any>(null);
 
   if (isLoading) return <Loading />;
@@ -421,7 +421,7 @@ const OrdersAdmin = () => {
 
 // === Announcements Admin ===
 const AnnouncementsAdmin = () => {
-  const { data: items, isLoading, upsert, remove } = useCrud<any>("announcements");
+  const { data: items, isLoading, upsert, remove } = useCrud("announcements");
   const [editing, setEditing] = useState<any>(null);
 
   if (isLoading) return <Loading />;
