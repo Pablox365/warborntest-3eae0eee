@@ -195,11 +195,7 @@
 .delay-900 { animation-delay: 0.9s; }
 .delay-1000 { animation-delay: 1s; }
 
-/* HUD corner decorations */
-.hud-corner { position: relative; }
-.hud-corner::before, .hud-corner::after { content: ''; position: absolute; width: 12px; height: 12px; border-color: hsl(142 70% 45% / 0.5); }
-.hud-corner::before { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; }
-.hud-corner::after { bottom: 0; right: 0; border-bottom: 2px solid; border-left: 0; border-right: 2px solid; }
+/* HUD corners removed - cleaner design */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; }
