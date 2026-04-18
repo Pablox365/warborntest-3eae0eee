@@ -7,6 +7,17 @@ import { useState } from "react";
 
 const MilsimSection = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { data, isLoading } = useLiveServers();
+  const live = data?.milsim;
+  const [showAllMods, setShowAllMods] = useState(false);
+  const visibleMods = live?.mods ?? [];
+  const modsToShow = showAllMods ? visibleMods : visibleMods.slice(0, 12);
+
+  const copyIp = () => {
+    if (!live?.address) return;
+    navigator.clipboard.writeText(live.address);
+    toast.success("IP copiada");
+  };
 
   return (
     <section id="milsim" className="relative py-24 md:py-32 overflow-hidden isolate" ref={ref}>
