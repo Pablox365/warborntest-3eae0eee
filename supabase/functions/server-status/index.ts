@@ -15,11 +15,14 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function fetchServer(id: string) {
   let lastStatus = 0;
-  // Retry up to 3 times on 5xx / network errors
+  let lastBody = "";
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const res = await fetch(`https://api.battlemetrics.com/servers/${id}?_=${Date.now()}`, {
-        headers: { Accept: "application/json", "Cache-Control": "no-cache" },
+      const res = await fetch(`https://api.battlemetrics.com/servers/${id}`, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "WarbornStatus/1.0 (+https://warborn.lovable.app)",
+        },
       });
       if (res.ok) {
         const json = await res.json();
@@ -52,16 +55,17 @@ async function fetchServer(id: string) {
         };
       }
       lastStatus = res.status;
-      // Only retry on 5xx
-      if (res.status < 500) break;
-    } catch (_e) {
+      try { lastBody = (await res.text()).slice(0, 200); } catch { /* ignore */ }
+      // Retry on 429 (rate limit) and 5xx
+      if (res.status !== 429 && res.status < 500) break;
+    } catch (e) {
       lastStatus = 0;
+      lastBody = e instanceof Error ? e.message : String(e);
     }
-    await sleep(300 * (attempt + 1));
+    await sleep(500 * (attempt + 1));
   }
 
-  // Fallback placeholder so UI doesn't crash
-  console.warn(`BattleMetrics ${id} unavailable (status ${lastStatus})`);
+  console.warn(`BattleMetrics ${id} unavailable (status ${lastStatus}): ${lastBody}`);
   return {
     id,
     name: "",
