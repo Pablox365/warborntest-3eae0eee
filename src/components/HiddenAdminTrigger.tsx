@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import Admin from "@/pages/Admin";
 
 const HiddenAdminTrigger = () => {
@@ -11,20 +11,38 @@ const HiddenAdminTrigger = () => {
         e.preventDefault();
         setOpen((v) => !v);
       }
-      if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
+  // Lock body scroll when open
+  useEffect(() => {
+    if (open) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [open]);
+
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden border-primary/30">
-        <div className="h-full overflow-y-auto">
-          <Admin />
-        </div>
-      </DialogContent>
-    </Dialog>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Panel de administración"
+      className="fixed inset-0 z-[200] bg-background overflow-y-auto"
+    >
+      <button
+        onClick={() => setOpen(false)}
+        aria-label="Cerrar panel admin"
+        className="fixed top-3 right-3 z-[210] w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border hover:bg-destructive/10 hover:border-destructive transition-colors"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      <Admin />
+    </div>
   );
 };
 
