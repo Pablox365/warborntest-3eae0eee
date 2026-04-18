@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Package, Box, ShoppingCart, Megaphone, Plus, Pencil, Trash2, Save, X, Shield, Star, MessageSquare } from "lucide-react";
+import { LogOut, Package, Box, ShoppingCart, Megaphone, Plus, Pencil, Trash2, Save, X, Shield, Star } from "lucide-react";
 
 const Admin = () => {
   const { session, isAdmin, loading, signOut, loginWithMaster } = useAdmin();
@@ -268,8 +268,7 @@ const ModsAdmin = () => {
   );
 };
 
-// === Roadmap Admin ===
-const RoadmapAdmin = () => {
+// (Roadmap admin removed)
   const { data: items, isLoading, upsert, remove } = useCrud("roadmap_items");
   const [editing, setEditing] = useState<any>(null);
 
@@ -448,26 +447,99 @@ const AnnouncementsAdmin = () => {
   );
 };
 
+// === Feedback Admin ===
+const FeedbackAdmin = () => {
+  const qc = useQueryClient();
+  const { data: items, isLoading } = useQuery({
+    queryKey: ["feedback-admin"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("feedback").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const toggle = useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      const { error } = await supabase.from("feedback").update({ approved }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feedback-admin"] }),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("feedback").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feedback-admin"] }),
+  });
+
+  if (isLoading) return <Loading />;
+
+  return (
+    <div>
+      <h2 className="font-heading text-lg tracking-wider mb-4">RESEÑAS</h2>
+      {items?.length === 0 && <p className="text-muted-foreground text-sm">No hay reseñas todavía.</p>}
+      <div className="grid gap-3">
+        {items?.map((f: any) => (
+          <div key={f.id} className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-heading text-sm tracking-wider">{f.name}</span>
+                  <div className="flex">
+                    {[1,2,3,4,5].map(n => (
+                      <Star key={n} className={`w-3 h-3 ${n <= f.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
+                    ))}
+                  </div>
+                  <span className={`text-[8px] px-2 py-0.5 rounded-full font-heading tracking-wider ${f.approved ? "bg-primary/20 text-primary" : "bg-destructive/20 text-destructive"}`}>{f.approved ? "VISIBLE" : "OCULTA"}</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">{new Date(f.created_at).toLocaleString("es-ES")}</span>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={() => toggle.mutate({ id: f.id, approved: !f.approved })} className="px-3 py-1.5 text-[9px] font-heading tracking-wider rounded-lg border border-border hover:border-primary/50">
+                  {f.approved ? "OCULTAR" : "MOSTRAR"}
+                </button>
+                <button onClick={() => { if (confirm("¿Eliminar reseña?")) remove.mutate(f.id); }} className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"><Trash2 className="w-4 h-4 text-destructive" /></button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground font-body">{f.message}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // === Reusable Edit Form ===
-type FieldDef = { key: string; label: string; type: "text" | "textarea" | "number" | "select" | "boolean"; options?: string[] };
+type FieldDef = { key: string; label: string; type: "text" | "textarea" | "number" | "select" | "boolean" | "csv"; options?: string[] };
 
 const EditForm = ({ item, fields, onSave, onCancel, saving }: { item: any; fields: FieldDef[]; onSave: (item: any) => void; onCancel: () => void; saving: boolean }) => {
-  const [form, setForm] = useState({ ...item });
+  const [form, setForm] = useState<any>({ ...item });
 
   return (
     <div className="bg-card border border-primary/30 rounded-xl p-5 mb-6 animate-fade-up">
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((f) => (
-          <div key={f.key} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
+          <div key={f.key} className={f.type === "textarea" || f.type === "csv" ? "sm:col-span-2" : ""}>
             <label className="text-[9px] font-heading tracking-[0.15em] text-muted-foreground mb-1 block">{f.label}</label>
             {f.type === "textarea" ? (
               <textarea value={form[f.key] || ""} onChange={e => setForm({ ...form, [f.key]: e.target.value })} rows={3} className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors resize-none" />
+            ) : f.type === "csv" ? (
+              <textarea
+                value={Array.isArray(form[f.key]) ? form[f.key].join(", ") : ""}
+                onChange={e => setForm({ ...form, [f.key]: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean) })}
+                rows={2}
+                placeholder="https://..., https://..."
+                className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors resize-none"
+              />
             ) : f.type === "select" ? (
               <select value={form[f.key] || ""} onChange={e => setForm({ ...form, [f.key]: e.target.value })} className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors">
                 {f.options?.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
             ) : f.type === "boolean" ? (
-              <button onClick={() => setForm({ ...form, [f.key]: !form[f.key] })} className={`px-4 py-2 rounded-lg text-xs font-heading tracking-wider border transition-all ${form[f.key] ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border text-muted-foreground"}`}>
+              <button type="button" onClick={() => setForm({ ...form, [f.key]: !form[f.key] })} className={`px-4 py-2 rounded-lg text-xs font-heading tracking-wider border transition-all ${form[f.key] ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border text-muted-foreground"}`}>
                 {form[f.key] ? "SÍ" : "NO"}
               </button>
             ) : (
