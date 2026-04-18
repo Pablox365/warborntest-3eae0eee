@@ -1,6 +1,9 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import milsimLogo from "@/assets/warborn-milsim.png";
-import { ExternalLink, Shield } from "lucide-react";
+import { ExternalLink, Shield, Users, MapPin, Wifi, Copy, Package, Loader2 } from "lucide-react";
+import { useLiveServers } from "@/hooks/useLiveServers";
+import { toast } from "sonner";
+import { useState } from "react";
 
 const MilsimSection = () => {
   const { ref, isVisible } = useScrollAnimation();
