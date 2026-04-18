@@ -73,7 +73,7 @@ const HeroSection = () => {
               loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <div className="relative inline-block group">
+            <div className="relative block group">
               {/* Glow detrás */}
               <div
                 aria-hidden
