@@ -1,50 +1,29 @@
 import { useMemo, useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
-import { ExternalLink, Loader2, RefreshCw, Package, Search, Sparkles } from "lucide-react";
+import { ExternalLink, Loader2, RefreshCw, Package, Search } from "lucide-react";
 import { useLiveServers, type LiveMod } from "@/hooks/useLiveServers";
-import { useModCategories, MOD_CATEGORIES, type ModCategory } from "@/hooks/useModCategories";
-
-type ServerFilter = "normal" | "hardcore";
-type CategoryFilter = ModCategory | "TODOS";
 
 const ModsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
   const [search, setSearch] = useState("");
-  const [serverFilter, setServerFilter] = useState<ServerFilter>("normal");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("TODOS");
   const { data, isLoading, isFetching, dataUpdatedAt } = useLiveServers();
 
-  const mods: LiveMod[] = data?.[serverFilter]?.mods ?? [];
-
-  // Combine mods from both servers for classification (single AI call covers everything)
-  const allMods: LiveMod[] = useMemo(() => {
+  // Combine mods from both servers, deduplicated
+  const mods: LiveMod[] = useMemo(() => {
     const map = new Map<string, LiveMod>();
     for (const m of data?.normal?.mods ?? []) map.set(m.modId, m);
     for (const m of data?.hardcore?.mods ?? []) if (!map.has(m.modId)) map.set(m.modId, m);
     return Array.from(map.values());
   }, [data?.normal?.mods, data?.hardcore?.mods]);
 
-  const { data: categories = {}, isLoading: catLoading } = useModCategories(allMods);
-
   const filtered = useMemo(() => {
-    let list = mods;
-    if (categoryFilter !== "TODOS") {
-      list = list.filter((m) => (categories[m.modId] ?? "OTROS") === categoryFilter);
-    }
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter((m) => m.name.toLowerCase().includes(q));
-    }
-    return list;
-  }, [mods, categories, categoryFilter, search]);
+    if (!search) return mods;
+    const q = search.toLowerCase();
+    return mods.filter((m) => m.name.toLowerCase().includes(q));
+  }, [mods, search]);
 
   const lastUpdate = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
-
-  const serverFilters: { key: ServerFilter; label: string }[] = [
-    { key: "normal", label: "NORMAL" },
-    { key: "hardcore", label: "HARDCORE" },
-  ];
 
   return (
     <section id="mods" className="relative py-20 md:py-32 bg-card/30" ref={ref}>
@@ -53,7 +32,7 @@ const ModsSection = () => {
           visible={isVisible}
           label="WORKSHOP · LIVE"
           title="MODS ACTIVOS"
-          subtitle="Sincronizado en tiempo real desde BattleMetrics. Filtra por servidor y categoría."
+          subtitle="Sincronizado en tiempo real desde BattleMetrics."
         />
 
         <div className={`flex items-center justify-center gap-3 mt-6 transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
@@ -61,7 +40,7 @@ const ModsSection = () => {
             <span className="w-2 h-2 rounded-full bg-primary animate-status-pulse" />
             <span className="text-[9px] font-heading tracking-[0.2em] text-primary">{mods.length} MODS</span>
           </div>
-          {(isFetching || catLoading) && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
+          {isFetching && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
           {lastUpdate && (
             <span className="hidden sm:flex items-center gap-1 text-[9px] font-heading tracking-[0.2em] text-muted-foreground">
               <RefreshCw className="w-2.5 h-2.5" />
@@ -70,53 +49,7 @@ const ModsSection = () => {
           )}
         </div>
 
-        {/* Server filter */}
-        <div className={`flex flex-wrap items-center justify-center gap-2 mt-6 transition-all duration-700 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          {serverFilters.map((f) => {
-            const active = serverFilter === f.key;
-            return (
-              <button
-                key={f.key}
-                onClick={() => setServerFilter(f.key)}
-                className={`px-4 py-2 rounded-lg text-[10px] font-heading tracking-[0.25em] border transition-all ${
-                  active
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-                }`}
-              >
-                {f.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Category filter */}
-        <div className={`flex flex-wrap items-center justify-center gap-2 mt-3 transition-all duration-700 delay-250 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          {MOD_CATEGORIES.map((c) => {
-            const active = categoryFilter === c.key;
-            const count = c.key === "TODOS"
-              ? mods.length
-              : mods.filter((m) => (categories[m.modId] ?? "OTROS") === c.key).length;
-            return (
-              <button
-                key={c.key}
-                onClick={() => setCategoryFilter(c.key)}
-                disabled={count === 0 && c.key !== "TODOS"}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-[9px] font-heading tracking-[0.2em] border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
-                  active
-                    ? "bg-primary/15 text-primary border-primary/60"
-                    : "bg-card/50 text-muted-foreground border-border/60 hover:border-primary/40 hover:text-foreground"
-                }`}
-              >
-                {c.key === "TODOS" && <Sparkles className="w-2.5 h-2.5" />}
-                {c.label}
-                <span className={`text-[8px] px-1.5 py-0.5 rounded ${active ? "bg-primary/20" : "bg-secondary/60"}`}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className={`max-w-md mx-auto mt-4 mb-8 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <div className={`max-w-md mx-auto mt-6 mb-8 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
@@ -137,39 +70,32 @@ const ModsSection = () => {
           <p className="text-center text-xs text-muted-foreground font-body py-12">No se encontraron mods.</p>
         ) : (
           <div className={`max-w-3xl mx-auto bg-card border border-border rounded-xl overflow-hidden transition-all duration-700 delay-400 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-            <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-3 px-4 py-2.5 border-b border-border bg-secondary/30 text-[8px] font-heading tracking-[0.2em] text-muted-foreground">
+            <div className="grid grid-cols-[auto_1fr_auto_auto] gap-3 px-4 py-2.5 border-b border-border bg-secondary/30 text-[8px] font-heading tracking-[0.2em] text-muted-foreground">
               <span>#</span>
               <span>NOMBRE</span>
-              <span className="hidden md:inline">CATEGORÍA</span>
               <span className="hidden sm:inline">VERSIÓN</span>
               <span></span>
             </div>
             <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
-              {filtered.map((mod, i) => {
-                const cat = categories[mod.modId] ?? (catLoading ? null : "OTROS");
-                return (
-                  <a
-                    key={mod.modId}
-                    href={`https://reforger.armaplatform.com/workshop/${mod.modId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-3 items-center px-4 py-3 hover:bg-secondary/40 transition-colors group"
-                  >
-                    <span className="text-[10px] font-mono-code text-muted-foreground w-6 text-right">{i + 1}</span>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary/20 transition-colors">
-                        <Package className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-xs font-heading tracking-wider truncate group-hover:text-primary transition-colors">{mod.name}</span>
+              {filtered.map((mod, i) => (
+                <a
+                  key={mod.modId}
+                  href={`https://reforger.armaplatform.com/workshop/${mod.modId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center px-4 py-3 hover:bg-secondary/40 transition-colors group"
+                >
+                  <span className="text-[10px] font-mono-code text-muted-foreground w-6 text-right">{i + 1}</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary/20 transition-colors">
+                      <Package className="w-3.5 h-3.5" />
                     </div>
-                    <span className="hidden md:inline text-[8px] font-heading tracking-[0.2em] px-2 py-0.5 rounded bg-secondary/60 text-muted-foreground">
-                      {cat ?? "..."}
-                    </span>
-                    <span className="hidden sm:inline text-[10px] font-mono-code text-muted-foreground">v{mod.version}</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
-                  </a>
-                );
-              })}
+                    <span className="text-xs font-heading tracking-wider truncate group-hover:text-primary transition-colors">{mod.name}</span>
+                  </div>
+                  <span className="hidden sm:inline text-[10px] font-mono-code text-muted-foreground">v{mod.version}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
+                </a>
+              ))}
             </div>
           </div>
         )}
