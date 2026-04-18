@@ -1,50 +1,29 @@
 import { useMemo, useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
-import { ExternalLink, Loader2, RefreshCw, Package, Search, Sparkles } from "lucide-react";
+import { ExternalLink, Loader2, RefreshCw, Package, Search } from "lucide-react";
 import { useLiveServers, type LiveMod } from "@/hooks/useLiveServers";
-import { useModCategories, MOD_CATEGORIES, type ModCategory } from "@/hooks/useModCategories";
-
-type ServerFilter = "normal" | "hardcore";
-type CategoryFilter = ModCategory | "TODOS";
 
 const ModsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
   const [search, setSearch] = useState("");
-  const [serverFilter, setServerFilter] = useState<ServerFilter>("normal");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("TODOS");
   const { data, isLoading, isFetching, dataUpdatedAt } = useLiveServers();
 
-  const mods: LiveMod[] = data?.[serverFilter]?.mods ?? [];
-
-  // Combine mods from both servers for classification (single AI call covers everything)
-  const allMods: LiveMod[] = useMemo(() => {
+  // Combine mods from both servers, deduplicated
+  const mods: LiveMod[] = useMemo(() => {
     const map = new Map<string, LiveMod>();
     for (const m of data?.normal?.mods ?? []) map.set(m.modId, m);
     for (const m of data?.hardcore?.mods ?? []) if (!map.has(m.modId)) map.set(m.modId, m);
     return Array.from(map.values());
   }, [data?.normal?.mods, data?.hardcore?.mods]);
 
-  const { data: categories = {}, isLoading: catLoading } = useModCategories(allMods);
-
   const filtered = useMemo(() => {
-    let list = mods;
-    if (categoryFilter !== "TODOS") {
-      list = list.filter((m) => (categories[m.modId] ?? "OTROS") === categoryFilter);
-    }
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter((m) => m.name.toLowerCase().includes(q));
-    }
-    return list;
-  }, [mods, categories, categoryFilter, search]);
+    if (!search) return mods;
+    const q = search.toLowerCase();
+    return mods.filter((m) => m.name.toLowerCase().includes(q));
+  }, [mods, search]);
 
   const lastUpdate = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
-
-  const serverFilters: { key: ServerFilter; label: string }[] = [
-    { key: "normal", label: "NORMAL" },
-    { key: "hardcore", label: "HARDCORE" },
-  ];
 
   return (
     <section id="mods" className="relative py-20 md:py-32 bg-card/30" ref={ref}>
