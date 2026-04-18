@@ -142,19 +142,8 @@ const HeroSection = () => {
             </a>
           </div>
 
-          {/* Live stats */}
-          <div
-            className={`flex flex-wrap gap-5 md:gap-10 transition-all duration-700 delay-600 ${
-              loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <LiveStat icon={<Crosshair className="w-4 h-4 text-primary" />} value={isLoading ? null : totalPlayers} label="JUGADORES EN VIVO" />
-            <LiveStat icon={<Shield className="w-4 h-4 text-primary" />} value={isLoading ? null : onlineCount} label="SERVIDORES ONLINE" total={2} />
-            <LiveStat icon={<Radio className="w-4 h-4 text-primary" />} value={isLoading ? null : totalMods} label="MODS ACTIVOS" />
-          </div>
-
           {/* HUD quick status */}
-          <div className={`flex flex-col sm:flex-row gap-3 mt-8 transition-all duration-700 delay-700 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          <div className={`flex flex-col sm:flex-row gap-3 transition-all duration-700 delay-600 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <ServerQuickStatus name="NORMAL" players={data?.normal?.players ?? 0} maxPlayers={data?.normal?.maxPlayers ?? 0} online={!!data?.normal?.online} loading={isLoading} />
             <ServerQuickStatus name="HARDCORE" players={data?.hardcore?.players ?? 0} maxPlayers={data?.hardcore?.maxPlayers ?? 0} online={!!data?.hardcore?.online} loading={isLoading} />
           </div>
