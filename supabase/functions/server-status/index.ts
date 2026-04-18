@@ -18,8 +18,8 @@ async function fetchServer(id: string) {
   // Retry up to 3 times on 5xx / network errors
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const res = await fetch(`https://api.battlemetrics.com/servers/${id}`, {
-        headers: { Accept: "application/json" },
+      const res = await fetch(`https://api.battlemetrics.com/servers/${id}?_=${Date.now()}`, {
+        headers: { Accept: "application/json", "Cache-Control": "no-cache" },
       });
       if (res.ok) {
         const json = await res.json();
