@@ -18,8 +18,8 @@ async function fetchServer(id: string) {
   // Retry up to 3 times on 5xx / network errors
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const res = await fetch(`https://api.battlemetrics.com/servers/${id}`, {
-        headers: { Accept: "application/json" },
+      const res = await fetch(`https://api.battlemetrics.com/servers/${id}?_=${Date.now()}`, {
+        headers: { Accept: "application/json", "Cache-Control": "no-cache" },
       });
       if (res.ok) {
         const json = await res.json();
@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
     ]);
     return new Response(JSON.stringify({ normal, hardcore, milsim, fetchedAt: new Date().toISOString() }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=30" },
+      headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

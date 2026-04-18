@@ -28,7 +28,7 @@ export type LiveServer = {
 
 export type LiveServers = { normal: LiveServer; hardcore: LiveServer; milsim: LiveServer; fetchedAt: string };
 
-export const REFETCH_MS = 60_000;
+export const REFETCH_MS = 30_000;
 
 export const useLiveServers = () =>
   useQuery({
@@ -40,5 +40,6 @@ export const useLiveServers = () =>
     },
     refetchInterval: REFETCH_MS,
     refetchIntervalInBackground: true,
-    staleTime: 45_000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
