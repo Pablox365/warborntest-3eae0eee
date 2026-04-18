@@ -67,26 +67,20 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-4 relative z-10 pt-28 pb-16">
         <div className="max-w-4xl">
-          {/* Wordmark Warborn — protagonista */}
+          {/* Logo Warborn — protagonista */}
           <div
-            className={`mb-6 md:mb-8 transition-all duration-700 delay-100 ${
+            className={`flex items-center mb-6 md:mb-8 transition-all duration-700 delay-100 ${
               loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <div className="relative inline-block group">
-              {/* Glow detrás */}
-              <div
-                aria-hidden
-                className="absolute inset-0 -z-10 blur-3xl opacity-40 bg-gradient-to-r from-primary/40 via-primary/10 to-primary/40 animate-glow-pulse"
+            <div className="relative group">
+              <img
+                src={warbornNormal}
+                alt="Warborn"
+                width={520}
+                height={200}
+                className="relative h-40 sm:h-56 md:h-72 lg:h-96 xl:h-[28rem] w-auto animate-float transition-transform duration-500 group-hover:scale-105 py-0 my-0 px-0 mx-0 -ml-2 md:-ml-4"
               />
-              <h2
-                className="warborn-wordmark font-heading font-black tracking-[0.18em] leading-none uppercase text-[3.5rem] sm:text-[5rem] md:text-[7rem] lg:text-[9rem] xl:text-[10.5rem] select-none"
-                data-text="WARBORN"
-              >
-                WARBORN
-              </h2>
-              {/* Línea inferior animada */}
-              <div className="mt-2 h-[3px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-80 animate-glow-pulse" />
             </div>
           </div>
 
