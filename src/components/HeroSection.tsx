@@ -6,7 +6,7 @@ import bgTank from "@/assets/bg-tank.jpg";
 import bgHeli from "@/assets/bg-heli.jpg";
 import bgSpain from "@/assets/bg-spain.jpg";
 import warbornNormal from "@/assets/warborn-normal.png";
-import { Crosshair, Shield, Radio, ChevronDown, Loader2 } from "lucide-react";
+import { Crosshair, ChevronDown } from "lucide-react";
 import { useLiveServers } from "@/hooks/useLiveServers";
 
 const SLIDES = [bgAds, bgTank, bgHeli, bgSpain, bgFlag];
@@ -18,9 +18,6 @@ const HeroSection = () => {
   const fullText = "ARMA REFORGER";
   const { data, isLoading } = useLiveServers();
 
-  const totalPlayers = (data?.normal?.players ?? 0) + (data?.hardcore?.players ?? 0);
-  const totalMods = data?.normal?.modCount ?? 0;
-  const onlineCount = (data?.normal?.online ? 1 : 0) + (data?.hardcore?.online ? 1 : 0);
 
   useEffect(() => {
     setLoaded(true);
