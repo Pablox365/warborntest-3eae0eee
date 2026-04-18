@@ -5,7 +5,7 @@ import bgFlag from "@/assets/bg-flag.jpg";
 import bgTank from "@/assets/bg-tank.jpg";
 import bgHeli from "@/assets/bg-heli.jpg";
 import bgSpain from "@/assets/bg-spain.jpg";
-import warbornNormal from "@/assets/warborn-normal.png";
+
 import { Crosshair, ChevronDown } from "lucide-react";
 import { useLiveServers } from "@/hooks/useLiveServers";
 
@@ -166,19 +166,6 @@ const HeroSection = () => {
     </section>
   );
 };
-
-const LiveStat = ({ icon, value, label, total }: { icon: React.ReactNode; value: number | null; label: string; total?: number }) => (
-  <div className="flex items-center gap-3">
-    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">{icon}</div>
-    <div>
-      <div className="text-lg md:text-xl font-heading font-bold text-foreground flex items-center gap-1">
-        {value === null ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /> : <>{value}{total ? `/${total}` : ""}</>}
-      </div>
-      <div className="text-[8px] font-heading tracking-[0.2em] text-muted-foreground">{label}</div>
-    </div>
-  </div>
-);
-
 const ServerQuickStatus = ({ name, players, maxPlayers, online, loading }: { name: string; players: number; maxPlayers: number; online: boolean; loading: boolean }) => (
   <div className="flex items-center gap-3 px-4 py-3 glass rounded-xl animate-hud-flicker group hover:border-primary/30 transition-all duration-300">
     <div className="flex flex-col">
