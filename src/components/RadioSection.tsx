@@ -1,5 +1,6 @@
 import { Radio, Play, Pause, SkipForward, Volume2 } from "lucide-react";
 import { useRadio } from "@/contexts/RadioContext";
+import warbornLogo from "@/assets/warborn-normal.png";
 
 const RadioSection = () => {
   const { tracks, currentTrack, isPlaying, isUserControlled, playTrack, togglePlayPause, nextTrack, releaseToBackground } = useRadio();
@@ -101,10 +102,21 @@ const RadioSection = () => {
                     : "bg-card/50 border-border/50 hover:border-primary/30 hover:bg-card"
                 }`}
               >
-                <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-mono text-xs font-bold ${
-                  active ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground group-hover:text-primary"
+                <div className={`relative shrink-0 w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden ${
+                  active ? "bg-primary/20 ring-1 ring-primary" : "bg-secondary group-hover:bg-secondary/80"
                 }`}>
-                  {active && isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                  <img
+                    src={warbornLogo}
+                    alt="Warborn"
+                    className={`w-7 h-7 object-contain transition-opacity ${active ? "opacity-30" : "opacity-80 group-hover:opacity-100"}`}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {active && isPlaying ? (
+                      <Pause className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Play className={`w-4 h-4 ml-0.5 ${active ? "text-primary" : "text-foreground opacity-0 group-hover:opacity-100 transition-opacity"}`} />
+                    )}
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={`text-[9px] font-heading tracking-[0.2em] ${active ? "text-primary" : "text-muted-foreground"}`}>
