@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import warbornNormal from "@/assets/warborn-normal.png";
 
 const navLinks = [
@@ -19,7 +19,6 @@ const Navbar = () => {
   const [logoClicks, setLogoClicks] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const activePath = location.pathname;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -68,17 +67,17 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-0.5">
           {navLinks.map((l) => (
             <button
-              key={l.href}
-              onClick={() => handleClick(l.href)}
+              key={l.to}
+              onClick={() => handleClick(l.to)}
               className={`px-3 py-1.5 text-[10px] font-heading tracking-[0.15em] transition-all duration-300 rounded-lg relative group ${
-                activeSection === l.href
+                location.pathname === l.to
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
             >
               {l.label}
               <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-px bg-primary transition-all duration-300 ${
-                activeSection === l.href ? "w-4" : "w-0 group-hover:w-4"
+                location.pathname === l.to ? "w-4" : "w-0 group-hover:w-4"
               }`} />
             </button>
           ))}
@@ -98,7 +97,7 @@ const Navbar = () => {
             DISCORD
           </a>
           <button
-            onClick={() => handleClick("#servers")}
+            onClick={() => handleClick("/servidores")}
             className="flex items-center gap-2 px-4 py-1.5 bg-primary text-primary-foreground rounded-lg text-[10px] font-heading tracking-[0.15em] font-bold hover:brightness-110 transition-all duration-300 glow-green-sm btn-military"
           >
             JUGAR
@@ -118,10 +117,10 @@ const Navbar = () => {
         <div className="px-4 py-4 flex flex-col gap-1 border-t border-border/30">
           {navLinks.map((l, i) => (
             <button
-              key={l.href}
-              onClick={() => handleClick(l.href)}
+              key={l.to}
+              onClick={() => handleClick(l.to)}
               className={`text-left px-4 py-2.5 font-heading tracking-[0.15em] text-xs rounded-lg transition-all duration-300 ${
-                activeSection === l.href
+                location.pathname === l.to
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-primary hover:bg-secondary/50"
               }`}
@@ -132,7 +131,7 @@ const Navbar = () => {
           ))}
           <div className="flex gap-2 mt-3 px-2">
             <a href="https://discord.com/invite/warbornesp" target="_blank" rel="noopener noreferrer" className="flex-1 text-center px-4 py-2.5 border border-border rounded-lg font-heading tracking-[0.15em] text-[10px] hover:border-[#5865F2] hover:text-[#5865F2] transition-all">DISCORD</a>
-            <button onClick={() => handleClick("#servers")} className="flex-1 text-center px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-heading tracking-[0.15em] text-[10px] font-bold">JUGAR</button>
+            <button onClick={() => handleClick("/servidores")} className="flex-1 text-center px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-heading tracking-[0.15em] text-[10px] font-bold">JUGAR</button>
           </div>
         </div>
       </div>
