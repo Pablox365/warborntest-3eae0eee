@@ -1,34 +1,28 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import warbornNormal from "@/assets/warborn-normal.png";
 
 const navLinks = [
-  { label: "INICIO", href: "#hero" },
-  { label: "SERVIDORES", href: "#servers" },
-  { label: "MODS", href: "#mods" },
-  { label: "ESTADO", href: "#status" },
-  { label: "RADIO", href: "#radio" },
-  { label: "MERCH", href: "#merch" },
-  { label: "PARTNERS", href: "#partners" },
+  { label: "INICIO", to: "/" },
+  { label: "SERVIDORES", to: "/servidores" },
+  { label: "MILSIM", to: "/milsim" },
+  { label: "MODS", to: "/mods" },
+  { label: "ESTADO", to: "/estado" },
+  { label: "RADIO", to: "/radio" },
+  { label: "MERCH", to: "/merch" },
+  { label: "PARTNERS", to: "/partners" },
 ];
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("#hero");
   const [logoClicks, setLogoClicks] = useState(0);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activePath = location.pathname;
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 50);
-      const sections = navLinks.map(l => l.href.slice(1));
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i]);
-        if (el && el.getBoundingClientRect().top <= 120) {
-          setActiveSection(`#${sections[i]}`);
-          break;
-        }
-      }
-    };
+    const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -45,14 +39,15 @@ const Navbar = () => {
     return () => clearTimeout(t);
   }, [logoClicks]);
 
-  const handleClick = (href: string) => {
+  const handleClick = (to: string) => {
     setMobileOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    navigate(to);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleLogoClick = () => {
     setLogoClicks((c) => c + 1);
-    handleClick("#hero");
+    handleClick("/");
   };
 
   return (
