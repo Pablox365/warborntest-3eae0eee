@@ -1,5 +1,6 @@
 import SiteLayout from "@/components/SiteLayout";
 import Seo from "@/components/Seo";
+import SeoBreadcrumbs from "@/components/SeoBreadcrumbs";
 import RadioSection from "@/components/RadioSection";
 
 const Radio = () => (
@@ -10,6 +11,7 @@ const Radio = () => (
       path="/radio"
     />
     <div className="pt-24">
+      <SeoBreadcrumbs items={[{ name: "Radio", path: "/radio" }]} />
       <RadioSection />
     </div>
   </SiteLayout>

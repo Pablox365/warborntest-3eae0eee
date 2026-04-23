@@ -1,5 +1,6 @@
 import SiteLayout from "@/components/SiteLayout";
 import Seo from "@/components/Seo";
+import SeoBreadcrumbs from "@/components/SeoBreadcrumbs";
 import PartnersSection from "@/components/PartnersSection";
 import DonationsSection from "@/components/DonationsSection";
 
@@ -11,6 +12,7 @@ const Partners = () => (
       path="/partners"
     />
     <div className="pt-24">
+      <SeoBreadcrumbs items={[{ name: "Partners", path: "/partners" }]} />
       <PartnersSection />
       <DonationsSection />
     </div>

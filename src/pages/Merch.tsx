@@ -1,5 +1,6 @@
 import SiteLayout from "@/components/SiteLayout";
 import Seo from "@/components/Seo";
+import SeoBreadcrumbs from "@/components/SeoBreadcrumbs";
 import MerchSection from "@/components/MerchSection";
 
 const Merch = () => (
@@ -10,6 +11,7 @@ const Merch = () => (
       path="/merch"
     />
     <div className="pt-24">
+      <SeoBreadcrumbs items={[{ name: "Merch", path: "/merch" }]} />
       <MerchSection />
     </div>
   </SiteLayout>
