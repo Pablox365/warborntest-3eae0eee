@@ -21,7 +21,7 @@ const Index = () => (
         name="description"
         content="Warborn: comunidad española de Arma Reforger. Servidores Normal, Hardcore y Milsim PvE en español. Únete a la mejor comunidad hispana de simulación táctica."
       />
-      <link rel="canonical" href="https://warborntest.lovable.app/" />
+      <link rel="canonical" href="https://warborn.es/" />
     </Helmet>
     <main className="min-h-screen bg-background">
       <Navbar />

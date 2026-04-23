@@ -17,4 +17,4 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-Sitemap: https://warborntest.lovable.app/sitemap.xml
+Sitemap: https://warborn.es/sitemap.xml
