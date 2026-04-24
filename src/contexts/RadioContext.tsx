@@ -19,7 +19,6 @@ export const RADIO_TRACKS: RadioTrack[] = [
   { id: "campo-gitano", title: "Mi campo Gitano", videoId: "8280pvw72C0" },
 ];
 
-const BG_VOLUME = 8;   // Volumen muy bajo de fondo
 const USER_VOLUME = 70; // Volumen cuando el user lo controla
 
 interface RadioContextValue {
@@ -91,7 +90,7 @@ export const RadioProvider = ({ children }: { children: ReactNode }) => {
         width: "0",
         videoId: initial.videoId,
         playerVars: {
-          autoplay: 1,
+          autoplay: 0,
           controls: 0,
           disablekb: 1,
           modestbranding: 1,
@@ -100,10 +99,7 @@ export const RadioProvider = ({ children }: { children: ReactNode }) => {
         events: {
           onReady: (e: any) => {
             setIsReady(true);
-            e.target.setVolume(BG_VOLUME);
-            try {
-              e.target.playVideo();
-            } catch {}
+            e.target.setVolume(USER_VOLUME);
           },
           onStateChange: (e: any) => {
             const YT = window.YT;
@@ -113,7 +109,7 @@ export const RadioProvider = ({ children }: { children: ReactNode }) => {
               setCurrentTrack(next);
               try {
                 e.target.loadVideoById(next.videoId);
-                e.target.setVolume(userControlledRef.current ? USER_VOLUME : BG_VOLUME);
+                e.target.setVolume(USER_VOLUME);
               } catch {}
             }
             if (e.data === YT.PlayerState.PLAYING) setIsPlaying(true);
@@ -134,25 +130,7 @@ export const RadioProvider = ({ children }: { children: ReactNode }) => {
     currentTrackIdRef.current = currentTrack?.id;
   }, [currentTrack]);
 
-  // Intentar arrancar reproducción tras la primera interacción del usuario
-  // (los navegadores bloquean autoplay con sonido)
-  useEffect(() => {
-    const tryStart = () => {
-      if (startedRef.current) return;
-      const p = playerRef.current;
-      if (p && typeof p.playVideo === "function") {
-        try {
-          p.setVolume(BG_VOLUME);
-          p.unMute?.();
-          p.playVideo();
-          startedRef.current = true;
-        } catch {}
-      }
-    };
-    const events = ["click", "keydown", "touchstart", "scroll"];
-    events.forEach((ev) => window.addEventListener(ev, tryStart, { once: false, passive: true }));
-    return () => events.forEach((ev) => window.removeEventListener(ev, tryStart));
-  }, []);
+  // Sin autoplay: la música solo arranca cuando el usuario la activa desde el reproductor.
 
   const playTrack = useCallback((track: RadioTrack) => {
     const p = playerRef.current;
@@ -194,7 +172,7 @@ export const RadioProvider = ({ children }: { children: ReactNode }) => {
     setIsUserControlled(false);
     if (p) {
       try {
-        p.setVolume(BG_VOLUME);
+        p.pauseVideo?.();
       } catch {}
     }
   }, []);
