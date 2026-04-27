@@ -68,6 +68,7 @@ export type Database = {
       feedback: {
         Row: {
           approved: boolean
+          avatar_url: string | null
           created_at: string
           id: string
           message: string
@@ -78,6 +79,7 @@ export type Database = {
         }
         Insert: {
           approved?: boolean
+          avatar_url?: string | null
           created_at?: string
           id?: string
           message: string
@@ -88,6 +90,7 @@ export type Database = {
         }
         Update: {
           approved?: boolean
+          avatar_url?: string | null
           created_at?: string
           id?: string
           message?: string
@@ -101,6 +104,7 @@ export type Database = {
       feedback_replies: {
         Row: {
           approved: boolean
+          avatar_url: string | null
           created_at: string
           feedback_id: string
           id: string
@@ -111,6 +115,7 @@ export type Database = {
         }
         Insert: {
           approved?: boolean
+          avatar_url?: string | null
           created_at?: string
           feedback_id: string
           id?: string
@@ -121,6 +126,7 @@ export type Database = {
         }
         Update: {
           approved?: boolean
+          avatar_url?: string | null
           created_at?: string
           feedback_id?: string
           id?: string

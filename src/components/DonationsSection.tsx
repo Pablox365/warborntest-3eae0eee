@@ -1,6 +1,7 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
 import { Server, Wrench, Settings, Heart } from "lucide-react";
+import { PerspectiveMarquee } from "@/components/ui/perspective-marquee";
 
 const uses = [
   { icon: <Server className="w-6 h-6" />, title: "Hosting", desc: "Servidores dedicados de alto rendimiento" },
@@ -12,7 +13,15 @@ const DonationsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section className="relative py-24 md:py-32 bg-card/30" ref={ref}>
+    <section className="relative py-24 md:py-32 bg-card/30 overflow-hidden" ref={ref}>
+      {/* Animated marquee background */}
+      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none select-none">
+        <PerspectiveMarquee
+          items={["HOSTING", "MODS", "MILSIM", "COMUNIDAD", "SOPORTE 24/7", "EVENTOS", "DESARROLLO"]}
+          fontSize={120}
+          pixelsPerFrame={0.8}
+        />
+      </div>
       <div className="container mx-auto px-4 relative z-10">
         <SectionHeader visible={isVisible} label="APOYO" title="DONACIONES" subtitle="Ayuda a mantener los servidores activos." />
 
