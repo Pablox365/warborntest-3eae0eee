@@ -23,9 +23,12 @@ import Partners from "./pages/Partners.tsx";
 const queryClient = new QueryClient();
 
 const App = () => {
+  // Show on every full page load (refresh included). Skip only for very recent
+  // loads (<60s) so SPA-like navigations don't re-trigger it.
   const [loading, setLoading] = useState(() => {
     if (typeof window === "undefined") return true;
-    return !sessionStorage.getItem("warborn-loaded");
+    const last = Number(sessionStorage.getItem("warborn-loaded-at") || 0);
+    return Date.now() - last > 60_000;
   });
 
   useEffect(() => {
@@ -46,7 +49,7 @@ const App = () => {
             {loading && (
               <LoadingScreen
                 onDone={() => {
-                  sessionStorage.setItem("warborn-loaded", "1");
+                  sessionStorage.setItem("warborn-loaded-at", String(Date.now()));
                   setLoading(false);
                 }}
               />
