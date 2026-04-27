@@ -71,7 +71,7 @@ const AnnouncementPopup = () => {
     <>
       {/* Popup banner */}
       <div
-        className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-2xl transition-all duration-500 ease-out ${
+        className={`fixed top-20 md:top-28 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-2xl transition-all duration-500 ease-out ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"
         }`}
       >
