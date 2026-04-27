@@ -117,7 +117,8 @@ ${message.slice(0, 2000)}
                     },
                     reason: {
                       type: "string",
-                      description: "Explicación breve en español (máx 100 caracteres)",
+                      description:
+                        "Explicación clara y profesional en español (máx 120 caracteres). Habla como moderador humano, no como bot. Ejemplos buenos: 'Mensaje aprobado: crítica legítima sobre el rendimiento del servidor', 'Insulto personal grave dirigido a otro jugador', 'Pendiente de revisión por lenguaje muy agresivo aunque podría ser opinión válida'. NO uses jerga técnica.",
                     },
                   },
                   required: ["decision", "category", "reason"],
