@@ -47,15 +47,40 @@ const FeedbackSection = () => {
       if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
       }
+      // 1. Moderate with AI
+      const { data: mod, error: modError } = await supabase.functions.invoke("moderate-content", {
+        body: {
+          name: parsed.data.name,
+          message: parsed.data.message,
+          rating: parsed.data.rating,
+          kind: "review",
+        },
+      });
+      if (modError) throw new Error("Error al moderar — inténtalo de nuevo");
+
+      const decision = mod?.decision ?? "review";
+      const approved = decision === "approve";
+
+      // 2. Insert with appropriate approval state
       const { error } = await supabase.from("feedback").insert({
         name: parsed.data.name,
         rating: parsed.data.rating,
         message: parsed.data.message,
+        approved,
+        moderation_reason: mod?.reason ?? null,
       });
       if (error) throw error;
+
+      return { decision };
     },
-    onSuccess: () => {
-      toast.success("¡Gracias por tu reseña!");
+    onSuccess: (result) => {
+      if (result?.decision === "approve") {
+        toast.success("¡Gracias por tu reseña!");
+      } else if (result?.decision === "reject") {
+        toast.error("Tu reseña no cumple las normas y ha sido rechazada.");
+      } else {
+        toast("Tu reseña está pendiente de revisión por un moderador.", { icon: "⏳" });
+      }
       setName(""); setRating(0); setMessage(""); setError("");
       qc.invalidateQueries({ queryKey: ["feedback-public"] });
     },
@@ -183,15 +208,33 @@ const ReviewCard = ({ review, index }: { review: any; index: number }) => {
     mutationFn: async () => {
       const parsed = replySchema.safeParse({ name: rName, message: rMessage });
       if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+      // 1. Moderate
+      const { data: mod, error: modError } = await supabase.functions.invoke("moderate-content", {
+        body: { name: parsed.data.name, message: parsed.data.message, kind: "reply" },
+      });
+      if (modError) throw new Error("Error al moderar — inténtalo de nuevo");
+
+      const decision = mod?.decision ?? "review";
+      const approved = decision === "approve";
+
       const { error } = await supabase.from("feedback_replies").insert({
         feedback_id: review.id,
         name: parsed.data.name,
         message: parsed.data.message,
+        approved,
+        moderation_reason: mod?.reason ?? null,
       });
       if (error) throw error;
+      return { decision };
     },
-    onSuccess: () => {
-      toast.success("Respuesta publicada");
+    onSuccess: (result) => {
+      if (result?.decision === "approve") {
+        toast.success("Respuesta publicada");
+      } else if (result?.decision === "reject") {
+        toast.error("Tu respuesta no cumple las normas.");
+      } else {
+        toast("Pendiente de revisión por un moderador.", { icon: "⏳" });
+      }
       setRName(""); setRMessage(""); setRError(""); setReplyOpen(false);
       setShowReplies(true);
       qc.invalidateQueries({ queryKey: ["feedback-replies", review.id] });
