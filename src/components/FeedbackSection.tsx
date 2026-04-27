@@ -78,12 +78,22 @@ const FeedbackSection = () => {
       const parsed = schema.safeParse({ name, rating, message });
       if (!parsed.success) throw new Error(parsed.error.issues[0].message);
 
-      const { data: mod, error: modError } = await supabase.functions.invoke("moderate-content", {
-        body: { name: parsed.data.name, message: parsed.data.message, rating: parsed.data.rating, kind: "review" },
-      });
-      if (modError) throw new Error("Error al moderar — inténtalo de nuevo");
-
-      const decision = mod?.decision ?? "review";
+      // Moderation with timeout + fail-open (manual review) so users never get stuck
+      let decision: "approve" | "reject" | "review" = "review";
+      let reason: string | null = "Pendiente de revisión";
+      try {
+        const modPromise = supabase.functions.invoke("moderate-content", {
+          body: { name: parsed.data.name, message: parsed.data.message, rating: parsed.data.rating, kind: "review" },
+        });
+        const timeout = new Promise<{ data: any; error: any }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: new Error("timeout") }), 8000),
+        );
+        const { data: mod, error: modError } = await Promise.race([modPromise, timeout]);
+        if (!modError && mod?.decision) {
+          decision = mod.decision;
+          reason = mod.reason ?? null;
+        }
+      } catch (_) { /* fail-open */ }
       const approved = decision === "approve";
 
       const { error } = await supabase.from("feedback").insert({
@@ -92,7 +102,7 @@ const FeedbackSection = () => {
         message: parsed.data.message,
         approved,
         avatar_url: avatarUrl,
-        moderation_reason: mod?.reason ?? null,
+        moderation_reason: reason,
       });
       if (error) throw error;
       return { decision };
@@ -314,18 +324,28 @@ const ReviewCard = ({ review, index }: { review: any; index: number }) => {
     mutationFn: async () => {
       const parsed = replySchema.safeParse({ name: rName, message: rMessage });
       if (!parsed.success) throw new Error(parsed.error.issues[0].message);
-      const { data: mod, error: modError } = await supabase.functions.invoke("moderate-content", {
-        body: { name: parsed.data.name, message: parsed.data.message, kind: "reply" },
-      });
-      if (modError) throw new Error("Error al moderar — inténtalo de nuevo");
-      const decision = mod?.decision ?? "review";
+      let decision: "approve" | "reject" | "review" = "review";
+      let reason: string | null = "Pendiente de revisión";
+      try {
+        const modPromise = supabase.functions.invoke("moderate-content", {
+          body: { name: parsed.data.name, message: parsed.data.message, kind: "reply" },
+        });
+        const timeout = new Promise<{ data: any; error: any }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: new Error("timeout") }), 8000),
+        );
+        const { data: mod, error: modError } = await Promise.race([modPromise, timeout]);
+        if (!modError && mod?.decision) {
+          decision = mod.decision;
+          reason = mod.reason ?? null;
+        }
+      } catch (_) { /* fail-open */ }
       const approved = decision === "approve";
       const { error } = await supabase.from("feedback_replies").insert({
         feedback_id: review.id,
         name: parsed.data.name,
         message: parsed.data.message,
         approved,
-        moderation_reason: mod?.reason ?? null,
+        moderation_reason: reason,
       });
       if (error) throw error;
       return { decision };
