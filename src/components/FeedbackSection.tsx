@@ -310,6 +310,7 @@ const FeedbackSection = () => {
           </div>
         </div>
       </div>
+      {overlay && <ModerationOverlay result={overlay} onClose={() => setOverlay(null)} />}
     </section>
   );
 };
