@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import { PerspectiveMarquee } from "@/components/ui/perspective-marquee";
-
-const PHRASES = [
-  "ARMA REFORGER",
-  "WARBORN ESPAÑA",
-  "NORMAL · HARDCORE · MILSIM",
-  "COMUNIDAD HISPANA",
-  "DESPLEGANDO TROPAS",
-];
+import alineaLogo from "@/assets/alinea-logo.png";
 
 const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
   const [progress, setProgress] = useState(0);
@@ -15,7 +7,7 @@ const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
 
   useEffect(() => {
     const start = performance.now();
-    const total = 1800;
+    const total = 1600;
     let raf = 0;
     const tick = () => {
       const elapsed = performance.now() - start;
@@ -25,7 +17,7 @@ const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
         raf = requestAnimationFrame(tick);
       } else {
         setHiding(true);
-        setTimeout(onDone, 500);
+        setTimeout(onDone, 450);
       }
     };
     raf = requestAnimationFrame(tick);
@@ -34,62 +26,74 @@ const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center transition-opacity duration-500 overflow-hidden ${
         hiding ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
       aria-busy="true"
-      aria-label="Cargando Warborn"
+      aria-label="Cargando — by Alinea"
     >
-      {/* Background marquee */}
-      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
-        <PerspectiveMarquee items={PHRASES} fontSize={120} pixelsPerFrame={1.2} rotateY={-25} rotateX={4} />
-      </div>
+      {/* Subtle radial glow */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-60"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 50%, hsl(var(--primary)/0.08), transparent 60%)",
+        }}
+      />
 
-      {/* Crosshair lines */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-primary/20" />
-        <div className="absolute top-1/2 left-0 right-0 h-px bg-primary/20" />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-48 md:h-48 border border-primary/30 rounded-full" />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-32 md:h-32 border border-primary/40 rounded-full animate-pulse" />
-      </div>
+      {/* Center: Alinea logo with breathing pulse */}
+      <div className="relative z-10 flex flex-col items-center px-6">
+        <div className="relative w-44 h-44 md:w-56 md:h-56 flex items-center justify-center">
+          {/* Rotating ring */}
+          <svg
+            className="absolute inset-0 w-full h-full animate-[spin_2.4s_linear_infinite]"
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="46"
+              stroke="hsl(var(--primary))"
+              strokeWidth="0.6"
+              strokeDasharray="4 8"
+              strokeLinecap="round"
+              opacity="0.5"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="46"
+              stroke="hsl(var(--primary))"
+              strokeWidth="1.2"
+              strokeDasharray={`${progress * 2.89} 999`}
+              strokeLinecap="round"
+              transform="rotate(-90 50 50)"
+              style={{ transition: "stroke-dasharray 0.1s linear" }}
+            />
+          </svg>
 
-      {/* Center content */}
-      <div className="relative z-10 flex flex-col items-center px-6 w-full max-w-md">
-        <div className="font-heading tracking-[0.4em] text-[10px] md:text-xs text-primary/70 mb-2">
-          [ INICIANDO SESIÓN ]
-        </div>
-        <h1 className="font-heading font-black tracking-[0.15em] text-4xl md:text-6xl text-foreground mb-2 text-center">
-          WAR<span className="text-primary">BORN</span>
-        </h1>
-        <div className="font-body text-[10px] md:text-xs text-muted-foreground tracking-widest mb-8 uppercase text-center">
-          Comunidad Arma Reforger España
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full h-1.5 bg-secondary border border-border rounded-sm overflow-hidden">
-          <div
-            className="h-full bg-primary transition-[width] duration-100 ease-linear shadow-[0_0_20px_hsl(var(--primary)/0.6)]"
-            style={{ width: `${progress}%` }}
+          {/* Logo with breathing animation */}
+          <img
+            src={alineaLogo}
+            alt="Alinea"
+            className="relative w-32 h-32 md:w-40 md:h-40 object-contain animate-[pulse_2s_ease-in-out_infinite]"
+            draggable={false}
           />
         </div>
-        <div className="mt-2 flex justify-between w-full text-[9px] md:text-[10px] font-heading tracking-widest text-muted-foreground">
-          <span>CARGANDO ASSETS</span>
-          <span className="text-primary">{Math.floor(progress)}%</span>
+
+        {/* Progress text */}
+        <div className="mt-6 font-heading text-[10px] md:text-xs tracking-[0.5em] text-muted-foreground">
+          {Math.floor(progress)}%
+        </div>
+
+        {/* Footer credit */}
+        <div className="absolute bottom-8 left-0 right-0 text-center">
+          <div className="font-heading text-[9px] md:text-[10px] tracking-[0.4em] text-muted-foreground/60 uppercase">
+            Powered by <span className="text-primary/80">Alinea</span>
+          </div>
         </div>
       </div>
-
-      {/* Corner brackets */}
-      {[
-        "top-4 left-4 border-t border-l",
-        "top-4 right-4 border-t border-r",
-        "bottom-4 left-4 border-b border-l",
-        "bottom-4 right-4 border-b border-r",
-      ].map((cls) => (
-        <div
-          key={cls}
-          className={`absolute w-8 h-8 md:w-12 md:h-12 border-primary ${cls}`}
-        />
-      ))}
     </div>
   );
 };
