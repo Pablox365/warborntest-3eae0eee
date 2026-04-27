@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
 import hostingLogo from "@/assets/logowithtext.png";
-import alineaLogo from "@/assets/alinea-logo.png";
+import alineaLogo from "@/assets/alinea-webs-logo.png";
 import { Copy, Check, Tag, ExternalLink, Code2 } from "lucide-react";
 import { toast } from "sonner";
 
