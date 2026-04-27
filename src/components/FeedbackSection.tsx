@@ -1,12 +1,13 @@
 import { useState, useMemo, useRef } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
-import { Star, Loader2, Quote, MessageCircle, Send, CornerDownRight, Upload, X } from "lucide-react";
+import { Star, Loader2, Quote, MessageCircle, Send, CornerDownRight, Upload, X, ShieldCheck } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 import { TestimonialsColumn, type Testimonial } from "@/components/ui/testimonials-column";
+import alineaLogo from "@/assets/alinea-logo.png";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Pon tu nombre").max(60),
@@ -139,7 +140,7 @@ const FeedbackSection = () => {
   }, [reviews]);
 
   return (
-    <section className="relative py-24 md:py-32 bg-card/30 overflow-hidden" ref={ref}>
+    <section className="relative py-24 md:py-32 bg-card/20 overflow-hidden" ref={ref}>
       <div className="container mx-auto px-4 relative z-10">
         <SectionHeader visible={isVisible} label="COMUNIDAD" title="RESEÑAS" subtitle="Lo que dicen los miembros de Warborn." />
 
@@ -155,8 +156,67 @@ const FeedbackSection = () => {
           </div>
         )}
 
-        {/* Form */}
-        <div className={`max-w-2xl mx-auto mt-12 bg-card border border-border rounded-xl p-6 md:p-8 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+        {/* Alinea AI supervision badge */}
+        <div className={`flex items-center justify-center gap-2 mt-5 transition-all duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border">
+            <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+            <span className="font-heading text-[9px] md:text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+              Supervisado por
+            </span>
+            <img src={alineaLogo} alt="Alinea AI" className="h-4 md:h-5 w-auto object-contain" />
+            <span className="font-heading text-[9px] md:text-[10px] tracking-[0.25em] text-primary uppercase">AI</span>
+          </div>
+        </div>
+
+        {/* Animated columns FIRST */}
+        {!showAll && reviews && reviews.length > 0 && (
+          <div className="mt-12">
+            <div
+              className="relative flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]"
+              style={{ maxHeight: "600px", overflow: "hidden" }}
+            >
+              <TestimonialsColumn testimonials={col1} duration={20} />
+              <TestimonialsColumn testimonials={col2} duration={28} className="hidden md:block" />
+              <TestimonialsColumn testimonials={col3} duration={24} className="hidden lg:block" />
+            </div>
+          </div>
+        )}
+
+        {!reviews && (
+          <div className="mt-12 flex justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
+        {reviews && reviews.length === 0 && (
+          <div className="max-w-md mx-auto mt-12 bg-card border border-border rounded-xl p-8 text-center">
+            <Quote className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-xs text-muted-foreground font-body">Sé el primero en dejar una reseña</p>
+          </div>
+        )}
+
+        {/* Show all toggle + full list with replies */}
+        {reviews && reviews.length > 0 && (
+          <div className="mt-10 text-center">
+            <button
+              onClick={() => setShowAll(v => !v)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary border border-border hover:border-primary rounded-lg font-heading tracking-[0.15em] text-xs font-bold text-foreground hover:text-primary transition-all"
+            >
+              {showAll ? "OCULTAR" : `VER TODAS (${reviews.length})`}
+            </button>
+          </div>
+        )}
+
+        {showAll && reviews && reviews.length > 0 && (
+          <div className="grid md:grid-cols-2 gap-4 mt-10 animate-fade-up">
+            {reviews.map((r, i) => (
+              <ReviewCard key={r.id} review={r} index={i} />
+            ))}
+          </div>
+        )}
+
+        {/* Form AFTER reviews */}
+        <div className={`max-w-2xl mx-auto mt-16 bg-card border border-border rounded-xl p-6 md:p-8 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
           <h3 className="font-heading text-sm tracking-[0.2em] mb-1">DEJA TU RESEÑA</h3>
           <p className="text-xs text-muted-foreground mb-5 font-body">Tu opinión ayuda a mejorar Warborn.</p>
 
@@ -246,53 +306,6 @@ const FeedbackSection = () => {
             </button>
           </div>
         </div>
-
-        {/* Animated columns */}
-        {!showAll && reviews && reviews.length > 0 && (
-          <div className="mt-16">
-            <div
-              className="relative flex justify-center gap-6 mt-4 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]"
-              style={{ maxHeight: "600px", overflow: "hidden" }}
-            >
-              <TestimonialsColumn testimonials={col1} duration={20} />
-              <TestimonialsColumn testimonials={col2} duration={28} className="hidden md:block" />
-              <TestimonialsColumn testimonials={col3} duration={24} className="hidden lg:block" />
-            </div>
-          </div>
-        )}
-
-        {!reviews && (
-          <div className="mt-12 flex justify-center">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
-        )}
-
-        {reviews && reviews.length === 0 && (
-          <div className="max-w-md mx-auto mt-12 bg-card border border-border rounded-xl p-8 text-center">
-            <Quote className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-            <p className="text-xs text-muted-foreground font-body">Sé el primero en dejar una reseña</p>
-          </div>
-        )}
-
-        {/* Show all toggle + full list with replies */}
-        {reviews && reviews.length > 0 && (
-          <div className="mt-10 text-center">
-            <button
-              onClick={() => setShowAll(v => !v)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary border border-border hover:border-primary rounded-lg font-heading tracking-[0.15em] text-xs font-bold text-foreground hover:text-primary transition-all"
-            >
-              {showAll ? "OCULTAR" : `VER TODAS (${reviews.length})`}
-            </button>
-          </div>
-        )}
-
-        {showAll && reviews && reviews.length > 0 && (
-          <div className="grid md:grid-cols-2 gap-4 mt-10 animate-fade-up">
-            {reviews.map((r, i) => (
-              <ReviewCard key={r.id} review={r} index={i} />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );
