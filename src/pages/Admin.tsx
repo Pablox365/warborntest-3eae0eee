@@ -3,6 +3,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Package, Box, ShoppingCart, Megaphone, Plus, Pencil, Trash2, Save, X, Shield, Star } from "lucide-react";
+import alineaLogo from "@/assets/alinea-logo.png";
 
 const Admin = () => {
   const { session, isAdmin, loading, signOut, loginWithMaster } = useAdmin();
