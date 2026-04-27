@@ -19,7 +19,14 @@ export type Database = {
           active: boolean
           content: string | null
           created_at: string
+          detailed_description: string | null
+          emoji: string | null
+          expires_at: string | null
           id: string
+          play_sound: boolean
+          priority: number
+          short_text: string | null
+          starts_at: string | null
           title: string
           type: string
           updated_at: string
@@ -28,7 +35,14 @@ export type Database = {
           active?: boolean
           content?: string | null
           created_at?: string
+          detailed_description?: string | null
+          emoji?: string | null
+          expires_at?: string | null
           id?: string
+          play_sound?: boolean
+          priority?: number
+          short_text?: string | null
+          starts_at?: string | null
           title: string
           type?: string
           updated_at?: string
@@ -37,7 +51,14 @@ export type Database = {
           active?: boolean
           content?: string | null
           created_at?: string
+          detailed_description?: string | null
+          emoji?: string | null
+          expires_at?: string | null
           id?: string
+          play_sound?: boolean
+          priority?: number
+          short_text?: string | null
+          starts_at?: string | null
           title?: string
           type?: string
           updated_at?: string

@@ -5,6 +5,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RadioProvider } from "@/contexts/RadioContext";
+import AnnouncementPopup from "@/components/AnnouncementPopup";
+import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index.tsx";
 import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -39,6 +41,8 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <AnnouncementPopup />
+            <CookieConsent />
           </BrowserRouter>
         </RadioProvider>
       </TooltipProvider>
