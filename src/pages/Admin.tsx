@@ -494,6 +494,11 @@ const FeedbackAdmin = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground font-body">{f.message}</p>
+            {f.moderation_reason && (
+              <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-secondary/50 border border-border rounded text-[9px] font-mono-code text-muted-foreground">
+                🤖 IA: {f.moderation_reason}
+              </div>
+            )}
             <FeedbackRepliesAdmin feedbackId={f.id} />
           </div>
         ))}
@@ -548,6 +553,11 @@ const FeedbackRepliesAdmin = ({ feedbackId }: { feedbackId: string }) => {
               <span className="text-[8px] text-muted-foreground">{new Date(rp.created_at).toLocaleString("es-ES")}</span>
             </div>
             <p className="text-[11px] text-muted-foreground font-body mt-0.5">{rp.message}</p>
+            {rp.moderation_reason && (
+              <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 bg-background/50 border border-border rounded text-[8px] font-mono-code text-muted-foreground">
+                🤖 {rp.moderation_reason}
+              </div>
+            )}
           </div>
           <div className="flex gap-1 shrink-0">
             <button onClick={() => toggle.mutate({ id: rp.id, approved: !rp.approved })} className="px-2 py-1 text-[8px] font-heading tracking-wider rounded border border-border hover:border-primary/50">
