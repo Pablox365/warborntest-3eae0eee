@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { RadioProvider } from "@/contexts/RadioContext";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import CookieConsent from "@/components/CookieConsent";
+import LoadingScreen from "@/components/LoadingScreen";
 import Index from "./pages/Index.tsx";
 import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -20,7 +22,20 @@ import Partners from "./pages/Partners.tsx";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !sessionStorage.getItem("warborn-loaded");
+  });
+
+  useEffect(() => {
+    if (!loading) return;
+    // Safety net: ensure we never block forever
+    const t = setTimeout(() => setLoading(false), 4000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
+  return (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -28,6 +43,14 @@ const App = () => (
         <Sonner />
         <RadioProvider>
           <BrowserRouter>
+            {loading && (
+              <LoadingScreen
+                onDone={() => {
+                  sessionStorage.setItem("warborn-loaded", "1");
+                  setLoading(false);
+                }}
+              />
+            )}
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/servidores" element={<Servidores />} />
@@ -48,6 +71,7 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
   </HelmetProvider>
-);
+  );
+};
 
 export default App;
