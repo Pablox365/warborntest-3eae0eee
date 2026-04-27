@@ -71,6 +71,7 @@ export type Database = {
           created_at: string
           id: string
           message: string
+          moderation_reason: string | null
           name: string
           rating: number
           updated_at: string
@@ -80,6 +81,7 @@ export type Database = {
           created_at?: string
           id?: string
           message: string
+          moderation_reason?: string | null
           name: string
           rating: number
           updated_at?: string
@@ -89,6 +91,7 @@ export type Database = {
           created_at?: string
           id?: string
           message?: string
+          moderation_reason?: string | null
           name?: string
           rating?: number
           updated_at?: string
@@ -102,6 +105,7 @@ export type Database = {
           feedback_id: string
           id: string
           message: string
+          moderation_reason: string | null
           name: string
           updated_at: string
         }
@@ -111,6 +115,7 @@ export type Database = {
           feedback_id: string
           id?: string
           message: string
+          moderation_reason?: string | null
           name: string
           updated_at?: string
         }
@@ -120,6 +125,7 @@ export type Database = {
           feedback_id?: string
           id?: string
           message?: string
+          moderation_reason?: string | null
           name?: string
           updated_at?: string
         }
