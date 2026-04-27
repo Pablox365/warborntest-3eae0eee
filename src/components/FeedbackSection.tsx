@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
-import { Star, Loader2, Quote } from "lucide-react";
+import { Star, Loader2, Quote, MessageCircle, Send, CornerDownRight } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -11,6 +11,11 @@ const schema = z.object({
   name: z.string().trim().min(1, "Pon tu nombre").max(60),
   rating: z.number().int().min(1, "Selecciona estrellas").max(5),
   message: z.string().trim().min(5, "Mínimo 5 caracteres").max(1000),
+});
+
+const replySchema = z.object({
+  name: z.string().trim().min(1, "Pon tu nombre").max(60),
+  message: z.string().trim().min(2, "Mínimo 2 caracteres").max(500),
 });
 
 const FeedbackSection = () => {
@@ -142,32 +147,162 @@ const FeedbackSection = () => {
               </div>
             )}
             {reviews?.map((r, i) => (
-              <div key={r.id} className="bg-card border border-border rounded-xl p-5 card-hover" style={{ transitionDelay: `${i * 50}ms` }}>
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-heading text-xs font-bold shrink-0">
-                      {r.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-heading text-xs tracking-wider truncate">{r.name}</div>
-                      <div className="text-[9px] text-muted-foreground font-body">
-                        {new Date(r.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0">
-                    {[1,2,3,4,5].map(n => (
-                      <Star key={n} className={`w-3.5 h-3.5 ${n <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"}`} />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground font-body leading-relaxed">{r.message}</p>
-              </div>
+              <ReviewCard key={r.id} review={r} index={i} />
             ))}
           </div>
         </div>
       </div>
     </section>
+  );
+};
+
+// === Review card with replies ===
+const ReviewCard = ({ review, index }: { review: any; index: number }) => {
+  const [showReplies, setShowReplies] = useState(false);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [rName, setRName] = useState("");
+  const [rMessage, setRMessage] = useState("");
+  const [rError, setRError] = useState("");
+  const qc = useQueryClient();
+
+  const { data: replies } = useQuery({
+    queryKey: ["feedback-replies", review.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feedback_replies")
+        .select("id,name,message,created_at")
+        .eq("feedback_id", review.id)
+        .eq("approved", true)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const submitReply = useMutation({
+    mutationFn: async () => {
+      const parsed = replySchema.safeParse({ name: rName, message: rMessage });
+      if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+      const { error } = await supabase.from("feedback_replies").insert({
+        feedback_id: review.id,
+        name: parsed.data.name,
+        message: parsed.data.message,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Respuesta publicada");
+      setRName(""); setRMessage(""); setRError(""); setReplyOpen(false);
+      setShowReplies(true);
+      qc.invalidateQueries({ queryKey: ["feedback-replies", review.id] });
+    },
+    onError: (e: any) => setRError(e.message ?? "Error al enviar"),
+  });
+
+  const replyCount = replies?.length ?? 0;
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-5 card-hover" style={{ transitionDelay: `${index * 50}ms` }}>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-heading text-xs font-bold shrink-0">
+            {review.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="font-heading text-xs tracking-wider truncate">{review.name}</div>
+            <div className="text-[9px] text-muted-foreground font-body">
+              {new Date(review.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
+            </div>
+          </div>
+        </div>
+        <div className="flex shrink-0">
+          {[1,2,3,4,5].map(n => (
+            <Star key={n} className={`w-3.5 h-3.5 ${n <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"}`} />
+          ))}
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground font-body leading-relaxed">{review.message}</p>
+
+      {/* Action bar */}
+      <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border/50">
+        <button
+          type="button"
+          onClick={() => setReplyOpen(!replyOpen)}
+          className="flex items-center gap-1.5 text-[10px] font-heading tracking-wider text-muted-foreground hover:text-primary transition-colors"
+        >
+          <MessageCircle className="w-3.5 h-3.5" /> RESPONDER
+        </button>
+        {replyCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowReplies(!showReplies)}
+            className="flex items-center gap-1.5 text-[10px] font-heading tracking-wider text-primary/80 hover:text-primary transition-colors"
+          >
+            <CornerDownRight className="w-3.5 h-3.5" />
+            {showReplies ? "OCULTAR" : "VER"} {replyCount} {replyCount === 1 ? "RESPUESTA" : "RESPUESTAS"}
+          </button>
+        )}
+      </div>
+
+      {/* Reply form */}
+      {replyOpen && (
+        <div className="mt-3 p-3 bg-secondary/30 border border-border rounded-lg space-y-2 animate-fade-up">
+          {rError && <div className="p-2 bg-destructive/10 border border-destructive/30 rounded text-[10px] text-destructive">{rError}</div>}
+          <input
+            type="text"
+            placeholder="Tu nombre"
+            value={rName}
+            onChange={e => setRName(e.target.value)}
+            maxLength={60}
+            className="w-full px-3 py-2 bg-background/50 border border-border rounded-lg text-xs focus:border-primary focus:outline-none transition-colors"
+          />
+          <textarea
+            placeholder="Tu respuesta..."
+            value={rMessage}
+            onChange={e => setRMessage(e.target.value)}
+            rows={2}
+            maxLength={500}
+            className="w-full px-3 py-2 bg-background/50 border border-border rounded-lg text-xs focus:border-primary focus:outline-none transition-colors resize-none"
+          />
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => { setReplyOpen(false); setRError(""); }}
+              className="px-3 py-1.5 text-[10px] font-heading tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            >
+              CANCELAR
+            </button>
+            <button
+              onClick={() => submitReply.mutate()}
+              disabled={submitReply.isPending}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-[10px] font-heading tracking-wider font-bold hover:brightness-110 transition-all disabled:opacity-50"
+            >
+              {submitReply.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+              ENVIAR
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Replies list */}
+      {showReplies && replies && replies.length > 0 && (
+        <div className="mt-3 space-y-2 pl-3 border-l-2 border-primary/30 animate-fade-up">
+          {replies.map((rp: any) => (
+            <div key={rp.id} className="bg-secondary/20 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary font-heading text-[9px] font-bold shrink-0">
+                  {rp.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-heading text-[10px] tracking-wider truncate">{rp.name}</span>
+                <span className="text-[8px] text-muted-foreground font-body ml-auto">
+                  {new Date(rp.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground font-body leading-relaxed">{rp.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

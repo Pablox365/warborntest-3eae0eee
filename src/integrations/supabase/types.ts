@@ -95,6 +95,44 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback_replies: {
+        Row: {
+          approved: boolean
+          created_at: string
+          feedback_id: string
+          id: string
+          message: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          feedback_id: string
+          id?: string
+          message: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          message?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_replies_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mods: {
         Row: {
           active: boolean

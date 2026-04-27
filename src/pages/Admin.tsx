@@ -494,9 +494,69 @@ const FeedbackAdmin = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground font-body">{f.message}</p>
+            <FeedbackRepliesAdmin feedbackId={f.id} />
           </div>
         ))}
       </div>
+    </div>
+  );
+};
+
+// === Feedback replies moderation (per review) ===
+const FeedbackRepliesAdmin = ({ feedbackId }: { feedbackId: string }) => {
+  const qc = useQueryClient();
+  const { data: replies } = useQuery({
+    queryKey: ["feedback-replies-admin", feedbackId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feedback_replies")
+        .select("*")
+        .eq("feedback_id", feedbackId)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const toggle = useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      const { error } = await supabase.from("feedback_replies").update({ approved }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feedback-replies-admin", feedbackId] }),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("feedback_replies").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feedback-replies-admin", feedbackId] }),
+  });
+
+  if (!replies || replies.length === 0) return null;
+
+  return (
+    <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
+      <div className="text-[9px] font-heading tracking-[0.15em] text-muted-foreground">RESPUESTAS ({replies.length})</div>
+      {replies.map((rp: any) => (
+        <div key={rp.id} className="flex items-start justify-between gap-2 bg-secondary/30 rounded-lg p-2 pl-3 border-l-2 border-primary/30">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-heading text-[10px] tracking-wider">{rp.name}</span>
+              <span className={`text-[8px] px-2 py-0.5 rounded-full font-heading tracking-wider ${rp.approved ? "bg-primary/20 text-primary" : "bg-destructive/20 text-destructive"}`}>{rp.approved ? "VISIBLE" : "OCULTA"}</span>
+              <span className="text-[8px] text-muted-foreground">{new Date(rp.created_at).toLocaleString("es-ES")}</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground font-body mt-0.5">{rp.message}</p>
+          </div>
+          <div className="flex gap-1 shrink-0">
+            <button onClick={() => toggle.mutate({ id: rp.id, approved: !rp.approved })} className="px-2 py-1 text-[8px] font-heading tracking-wider rounded border border-border hover:border-primary/50">
+              {rp.approved ? "OCULTAR" : "MOSTRAR"}
+            </button>
+            <button onClick={() => { if (confirm("¿Eliminar respuesta?")) remove.mutate(rp.id); }} className="p-1.5 hover:bg-destructive/10 rounded transition-colors"><Trash2 className="w-3 h-3 text-destructive" /></button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
