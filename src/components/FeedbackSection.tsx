@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { TestimonialsColumn, type Testimonial } from "@/components/ui/testimonials-column";
 import alineaLogo from "@/assets/alinea-logo.png";
+import ModerationOverlay, { type ModerationResult } from "@/components/ModerationOverlay";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Pon tu nombre").max(60),
@@ -31,6 +32,7 @@ const FeedbackSection = () => {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [overlay, setOverlay] = useState<ModerationResult | null>(null);
 
   const qc = useQueryClient();
   const { data: reviews } = useQuery({
@@ -109,10 +111,11 @@ const FeedbackSection = () => {
       return { decision };
     },
     onSuccess: (result) => {
-      if (result?.decision === "approve") toast.success("¡Gracias por tu reseña!");
-      else if (result?.decision === "reject") toast.error("Tu reseña no cumple las normas y ha sido rechazada.");
-      else toast("Tu reseña está pendiente de revisión por un moderador.", { icon: "⏳" });
-      setName(""); setRating(0); setMessage(""); setError(""); setAvatarUrl(null);
+      const decision = (result?.decision ?? "review") as ModerationResult;
+      setOverlay(decision);
+      if (decision === "approve") {
+        setName(""); setRating(0); setMessage(""); setError(""); setAvatarUrl(null);
+      }
       qc.invalidateQueries({ queryKey: ["feedback-public-all"] });
     },
     onError: (e: any) => setError(e.message ?? "Error al enviar"),
@@ -307,6 +310,7 @@ const FeedbackSection = () => {
           </div>
         </div>
       </div>
+      {overlay && <ModerationOverlay result={overlay} onClose={() => setOverlay(null)} />}
     </section>
   );
 };
