@@ -502,7 +502,7 @@ const FeedbackAdmin = () => {
 };
 
 // === Reusable Edit Form ===
-type FieldDef = { key: string; label: string; type: "text" | "textarea" | "number" | "select" | "boolean" | "csv" | "image" | "image_list"; options?: string[] };
+type FieldDef = { key: string; label: string; type: "text" | "textarea" | "number" | "select" | "boolean" | "csv" | "image" | "image_list" | "datetime"; options?: string[] };
 
 const uploadToImages = async (file: File): Promise<string> => {
   const ext = file.name.split(".").pop() || "jpg";
@@ -613,6 +613,8 @@ const EditForm = ({ item, fields, onSave, onCancel, saving }: { item: any; field
               <button type="button" onClick={() => setForm({ ...form, [f.key]: !form[f.key] })} className={`px-4 py-2 rounded-lg text-xs font-heading tracking-wider border transition-all ${form[f.key] ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border text-muted-foreground"}`}>
                 {form[f.key] ? "SÍ" : "NO"}
               </button>
+            ) : f.type === "datetime" ? (
+              <input type="datetime-local" value={form[f.key] ?? ""} onChange={e => setForm({ ...form, [f.key]: e.target.value })} className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors" />
             ) : (
               <input type={f.type} value={form[f.key] ?? ""} onChange={e => setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })} className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors" />
             )}
