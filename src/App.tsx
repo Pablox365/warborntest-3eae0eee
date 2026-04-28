@@ -20,6 +20,7 @@ import Estado from "./pages/Estado.tsx";
 import Radio from "./pages/Radio.tsx";
 import Merch from "./pages/Merch.tsx";
 import Partners from "./pages/Partners.tsx";
+import Reportar from "./pages/Reportar.tsx";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => {
               <Route path="/radio" element={<Radio />} />
               <Route path="/merch" element={<Merch />} />
               <Route path="/partners" element={<Partners />} />
+              <Route path="/reportar" element={<Reportar />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

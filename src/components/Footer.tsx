@@ -120,6 +120,15 @@ const Footer = () => (
           POWERED BY <span className="text-primary">ALINEA</span>
         </a>
       </div>
+
+      <div className="mt-3 text-center">
+        <a
+          href="/reportar"
+          className="inline-block text-[10px] font-heading tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-colors"
+        >
+          REPORTAR BUG O QUEJA
+        </a>
+      </div>
     </div>
   </footer>
 );
