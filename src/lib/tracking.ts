@@ -31,7 +31,7 @@ export async function trackEvent(
         path: opts.path ?? (typeof window !== "undefined" ? window.location.pathname : undefined),
         section: opts.section ?? undefined,
         session_id: getSessionId() ?? undefined,
-        metadata: (opts.metadata ?? {}) as Record<string, unknown>,
+        metadata: (opts.metadata ?? {}) as any,
       },
     ]);
   } catch (e) {
