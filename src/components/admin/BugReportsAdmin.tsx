@@ -32,7 +32,7 @@ const BugReportsAdmin = () => {
 
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
-      const { error } = await supabase.from("bug_reports").update(patch).eq("id", id);
+      const { error } = await supabase.from("bug_reports").update(patch as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
