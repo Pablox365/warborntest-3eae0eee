@@ -25,13 +25,15 @@ export async function trackEvent(
 ) {
   if (!hasConsent()) return;
   try {
-    await supabase.from("page_events").insert({
-      event_type,
-      path: opts.path ?? (typeof window !== "undefined" ? window.location.pathname : null),
-      section: opts.section ?? null,
-      session_id: getSessionId(),
-      metadata: opts.metadata ?? {},
-    });
+    await supabase.from("page_events").insert([
+      {
+        event_type,
+        path: opts.path ?? (typeof window !== "undefined" ? window.location.pathname : undefined),
+        section: opts.section ?? undefined,
+        session_id: getSessionId() ?? undefined,
+        metadata: (opts.metadata ?? {}) as Record<string, unknown>,
+      },
+    ]);
   } catch (e) {
     // silent — tracking must never break UI
     console.warn("trackEvent failed", e);
