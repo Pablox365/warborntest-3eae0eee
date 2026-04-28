@@ -78,7 +78,12 @@ const BugReportSection = () => {
 
       const { error: insertErr } = await supabase.from("bug_reports").insert([
         {
-          ...parsed.data,
+          player_name: parsed.data.player_name,
+          discord_id: parsed.data.discord_id,
+          server: parsed.data.server,
+          report_type: parsed.data.report_type,
+          title: parsed.data.title,
+          description: parsed.data.description,
           severity: severity ?? undefined,
           category: category ?? undefined,
           ai_summary: ai_summary ?? undefined,
