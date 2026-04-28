@@ -9,6 +9,7 @@ import { RadioProvider } from "@/contexts/RadioContext";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import CookieConsent from "@/components/CookieConsent";
 import LoadingScreen from "@/components/LoadingScreen";
+import { usePageTracking } from "@/hooks/usePageTracking";
 import Index from "./pages/Index.tsx";
 import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -21,6 +22,11 @@ import Merch from "./pages/Merch.tsx";
 import Partners from "./pages/Partners.tsx";
 
 const queryClient = new QueryClient();
+
+const RouteTracker = () => {
+  usePageTracking();
+  return null;
+};
 
 const App = () => {
   // Show on every full page load (refresh included). Skip only for very recent
@@ -46,6 +52,7 @@ const App = () => {
         <Sonner />
         <RadioProvider>
           <BrowserRouter>
+            <RouteTracker />
             {loading && (
               <LoadingScreen
                 onDone={() => {
