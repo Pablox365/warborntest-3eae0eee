@@ -65,6 +65,57 @@ export type Database = {
         }
         Relationships: []
       }
+      bug_reports: {
+        Row: {
+          admin_notes: string | null
+          ai_summary: string | null
+          category: string | null
+          created_at: string
+          description: string
+          discord_id: string
+          id: string
+          player_name: string
+          report_type: string
+          server: string
+          severity: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          ai_summary?: string | null
+          category?: string | null
+          created_at?: string
+          description: string
+          discord_id: string
+          id?: string
+          player_name: string
+          report_type?: string
+          server?: string
+          severity?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          ai_summary?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string
+          discord_id?: string
+          id?: string
+          player_name?: string
+          report_type?: string
+          server?: string
+          severity?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           approved: boolean
@@ -245,6 +296,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          path: string | null
+          section: string | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          path?: string | null
+          section?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          path?: string | null
+          section?: string | null
+          session_id?: string | null
+        }
+        Relationships: []
       }
       products: {
         Row: {

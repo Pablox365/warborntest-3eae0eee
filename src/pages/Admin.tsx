@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Package, Box, ShoppingCart, Megaphone, Plus, Pencil, Trash2, Save, X, Shield, Star } from "lucide-react";
 import alineaLogo from "@/assets/alinea-logo.png";
+import BugReportsAdmin from "@/components/admin/BugReportsAdmin";
+import InsightsAdmin from "@/components/admin/InsightsAdmin";
+import { Bug, Sparkles } from "lucide-react";
 
 const Admin = () => {
   const { session, isAdmin, loading, signOut, loginWithMaster } = useAdmin();
@@ -38,6 +41,8 @@ const Admin = () => {
             { id: "orders", label: "Pedidos", icon: <ShoppingCart className="w-4 h-4" /> },
             { id: "feedback", label: "Reseñas", icon: <Star className="w-4 h-4" /> },
             { id: "announcements", label: "Anuncios", icon: <Megaphone className="w-4 h-4" /> },
+            { id: "bugs", label: "Bug Reports", icon: <Bug className="w-4 h-4" /> },
+            { id: "insights", label: "Insights IA", icon: <Sparkles className="w-4 h-4" /> },
           ].map((t) => (
             <button
               key={t.id}
@@ -56,6 +61,8 @@ const Admin = () => {
         {tab === "orders" && <OrdersAdmin />}
         {tab === "feedback" && <FeedbackAdmin />}
         {tab === "announcements" && <AnnouncementsAdmin />}
+        {tab === "bugs" && <BugReportsAdmin />}
+        {tab === "insights" && <InsightsAdmin />}
       </div>
     </div>
   );
