@@ -7,7 +7,6 @@ const navLinks = [
   { label: "SERVIDORES", to: "/servidores" },
   { label: "MILSIM", to: "/milsim" },
   { label: "MODS", to: "/mods" },
-  { label: "ESTADO", to: "/estado" },
   { label: "RADIO", to: "/radio" },
   { label: "MERCH", to: "/merch" },
   { label: "PARTNERS", to: "/partners" },

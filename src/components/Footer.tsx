@@ -66,7 +66,7 @@ const Footer = () => (
         <div>
           <h4 className="text-[10px] font-heading tracking-[0.2em] text-muted-foreground mb-4">NAVEGACIÓN</h4>
           <div className="flex flex-col gap-2 items-center md:items-start">
-            {["Inicio", "Servidores", "Mods", "Estado", "Merch", "Partners"].map(l => (
+            {["Inicio", "Servidores", "Mods", "Merch", "Partners"].map(l => (
               <button
                 key={l}
                 onClick={() => document.querySelector(`#${l.toLowerCase() === "inicio" ? "hero" : l.toLowerCase()}`)?.scrollIntoView({ behavior: "smooth" })}
