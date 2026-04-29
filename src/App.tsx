@@ -16,7 +16,6 @@ import NotFound from "./pages/NotFound.tsx";
 import Servidores from "./pages/Servidores.tsx";
 import Milsim from "./pages/Milsim.tsx";
 import Mods from "./pages/Mods.tsx";
-import Estado from "./pages/Estado.tsx";
 import Radio from "./pages/Radio.tsx";
 import Merch from "./pages/Merch.tsx";
 import Partners from "./pages/Partners.tsx";
@@ -67,7 +66,6 @@ const App = () => {
               <Route path="/servidores" element={<Servidores />} />
               <Route path="/milsim" element={<Milsim />} />
               <Route path="/mods" element={<Mods />} />
-              <Route path="/estado" element={<Estado />} />
               <Route path="/radio" element={<Radio />} />
               <Route path="/merch" element={<Merch />} />
               <Route path="/partners" element={<Partners />} />
