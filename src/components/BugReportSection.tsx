@@ -59,7 +59,8 @@ const BugReportSection = () => {
       let category: string | null = null;
       let ai_summary: string | null = null;
       try {
-        const { data: aiData } = await supabase.functions.invoke("classify-bug-report", {
+        // Hard timeout (8s): si la IA tarda demasiado, guardamos el reporte igual sin clasificación
+        const aiPromise = supabase.functions.invoke("classify-bug-report", {
           body: {
             title: parsed.data.title,
             description: parsed.data.description,
@@ -67,6 +68,10 @@ const BugReportSection = () => {
             report_type: parsed.data.report_type,
           },
         });
+        const timeoutPromise = new Promise<{ data: null }>((resolve) =>
+          setTimeout(() => resolve({ data: null }), 8000),
+        );
+        const { data: aiData } = (await Promise.race([aiPromise, timeoutPromise])) as { data: any };
         if (aiData) {
           severity = aiData.severity ?? null;
           category = aiData.category ?? null;

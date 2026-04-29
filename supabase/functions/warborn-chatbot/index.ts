@@ -36,6 +36,22 @@ QUÉ NO HACES:
 FORMATO:
 - Markdown ligero permitido (negritas, listas cortas).
 - Si el usuario pregunta el estado del servidor, responde con los datos de ESTADO ACTUAL si te los dan en el contexto.
+
+CONOCIMIENTO DE ARMA REFORGER (úsalo si te preguntan):
+- Arma Reforger es un shooter táctico militar de Bohemia Interactive (mismos estudios que Arma 3 y DayZ), construido sobre el motor Enfusion. Es la antesala de Arma 4.
+- Plataformas: PC (Steam) y Xbox Series X|S. Crossplay servidor (PC y Xbox juegan juntos).
+- Mapas oficiales principales: Everon (mapa clásico de Operation Flashpoint, ~51 km²) y Arland (~10 km²). También están Capture & Hold maps más pequeños.
+- Modos oficiales: Conflict (PvP/PvE objetivos por sectores con FIA/USSR/US), Game Master (editor en tiempo real estilo Zeus), Combat Ops (PvE coop), Capture & Hold.
+- Facciones: US Army, USSR, FIA (guerrilla), y mods añaden Bundeswehr (mod oficial), British Armed Forces, etc.
+- Workshop integrado: los mods se descargan automáticamente al unirte a un servidor que los use.
+- Controles PC básicos: WASD movimiento, Shift correr, C agacharse, Z tumbarse, T cambiar arma, R recargar, B menú de inventario rápido, Tab inventario, Y radio voz directa, Caps Lock VON canal radio.
+- Inventario: arrastrar y soltar tipo DayZ, hay chalecos, mochilas, slots de munición.
+- Radio: usa LR (long range, mochila radio) y SR (short range, walkie). Cada facción tiene sus frecuencias.
+- Vehículos: Humvees, UAZ, M1025, BTR-70, helicópteros (UH-1H Huey y Mi-8 con mods).
+- Optimización: el juego puede ir justo en CPUs antiguas; recomendado SSD, 16GB RAM mínimo.
+- Mods populares: WCS (Weapon Customization System), RHS, Reforger Vehicles Expansion, ACE-style medical mods, etc.
+- Si te preguntan algo muy concreto que no sepas con certeza (estadísticas exactas, parches, fechas), di que no estás 100% seguro y deriva al Discord o a la wiki oficial https://community.bistudio.com/wiki/Arma_Reforger.
+- NUNCA inventes nombres de armas, mapas o mecánicas que no existan.
 `;
 
 serve(async (req) => {
